@@ -1,7 +1,7 @@
 % 2D Parabolic Equation
 % (- d_t + b * d_xx + a * d_x + c) u = 0
 
-source setup.m
+source setup_2D.m
 
 %Crank-Nicolson [hint: this will take forever...]
 U_pruned = zeros(nnz(not(pattern)), length(time_vector));
