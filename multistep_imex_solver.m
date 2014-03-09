@@ -4,6 +4,9 @@ function [time_vector, solution] = multistep_imex_solver(F, G, start, step, end_
   assert(s <= size(start, 1), "Error: too many steps provided as a starting point");
   time_vector = 0:step:end_time;
   
+  % FIXME this seems to work only for a(s+1) == 1
+  assert(a(s+1))
+  
   if(length(time_vector) < s)
     solution = start;
     error("Warning: Not enough time to inizialize the multistep method")

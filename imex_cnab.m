@@ -5,7 +5,7 @@ function [time_vector, solution] = imex_cnab(F, G, start, step, end_time)
   c = [0 1/2 1/2];
 
   % FIXME handle better the case of 
-  if (start + step > end_time)
+  if (step > end_time)
     disp("Warning: Couldn't reach multistep phase. Not enough steps")
     [time_vector, solution] = imex_euler111(F, G, start, end_time, end_time);
     return;

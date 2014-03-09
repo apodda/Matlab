@@ -1,11 +1,11 @@
 function [time_vector, solution] = imex_sbdf2(F, G, start, step, end_time)
 
-  a = [1 -4 3];
-  b = [-1 2 0];
-  c = [0 0 1];
+  a = [1/3 -4/3 1];
+  b = [-2/3 4/3 0];
+  c = [0 0 2/3];
 
   % FIXME handle better the case of 
-  if (start + step > end_time)
+  if (step > end_time)
     disp("Warning: Couldn't reach multistep phase. Not enough steps")
     [time_vector, solution] = imex_euler111(F, G, start, end_time, end_time);
     return;
@@ -27,6 +27,6 @@ end
 %!
 %! [t, y] = ode45(handle, time_vector, [0.5 0.5]);
 %!
-%! [tt, yy] = imex_cnab(F, G, [0.5; 0.5], step, 1);
+%! [tt, yy] = imex_sbdf2(F, G, [0.5; 0.5], step, 1);
 %!
 %! assert(yy, y', step); 

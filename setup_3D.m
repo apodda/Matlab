@@ -5,12 +5,12 @@
 r = 0.05; %r = 0.05;
 sigma = 0.3;
 
-lambda = 0.1;
+lambda = 2;
 delta = 1;
 E = exp(delta^2); % Moment generating function?
 
 K = 100;
-S_max = 300;
+S_max = 400;
 S_min = 1;
 
 % PDE parameters, after a change of value
@@ -23,7 +23,7 @@ if (abs(a) > abs(b))
 end
 
 % Grid parameters
-m = 61; % Number of grid points
+m = 81; % Number of grid points
 h = (log(S_max) - log(S_min)) / (m - 1); % 
 
 % x = log(S)
@@ -33,9 +33,9 @@ num_el = numel(grid_x);
 
 %Time advancement parameters
 initial_time = 0;
-end_time = 1;
+end_time = 0.25;
 
-k = h; % k = O(h)
+k = h * 0.5; % k = O(h)
 time_vector = initial_time:k:end_time;
 
 %Boundary conditions
@@ -49,7 +49,7 @@ pattern = logical(reshape(pattern_grid, num_el, 1));
 %We'll use the (discounted) initial conditions for the boundary. See Premia
 
 %Initial conditions (Rainbow option)
-initial_conditions_matrix = max(max(max(exp(grid_x), exp(grid_y)), exp(grid_z)) - K, 0);
+initial_conditions_matrix = max(max(max(exp(grid_x), exp(grid_y)) - K, exp(grid_z)), 0);
 initial_conditions_vector = reshape(initial_conditions_matrix, num_el, 1);
 
 %Finite difference approximations
@@ -80,9 +80,24 @@ grad = kron(kron(centered_differences, speye(m, m)), speye(m, m)) ...
 %trap_rule_mat = ones(1, num_el);
 %trap_rule_mat(1, pattern) *= 0.5;
 %FIXME the integral term is wrong. Build with the tensor product.
-gamma_mat = normpdf(reshape(grid_x, 1, num_el), 0, delta);
-gamma_mat = gamma_mat .* normpdf(reshape(grid_y, num_el, 1), 0, delta)';
-gamma_mat = gamma_mat .* normpdf(reshape(grid_z, num_el, 1), 0, delta)';
-gamma_mat(1, pattern) *= 0.5;
+%gamma_vec = normpdf(reshape(grid_x, 1, num_el), 0, delta);
+%gamma_vec = gamma_vec .* normpdf(reshape(grid_y, num_el, 1), 0, delta)';
+%gamma_vec = gamma_vec .* normpdf(reshape(grid_z, num_el, 1), 0, delta)';
+%gamma_vec(1, pattern) *= 0.5;
+
+gamma_mat = ones(m, m);
+gamma_mat(:, [1 end]) = gamma_mat(:, [1 end]) * 0.5; % Matlab dislikes *=
+
+% We apply the change variables y = x + z, the convolution
+%   \int u(x + z) Gamma(z) dz = \int u(y) Gamma(y - x) dy
+% This means that the integral term in x is equal to the convolution of the
+% solution with a gaussian random variable centered in x
+gamma_mat = gamma_mat .* normpdf(grid_x(:, :, 1), grid_x(:, :, 1)', delta);
+
+gamma_mat = sparse(gamma_mat);
+
+gamma_mat = kron(kron(trap_rule, speye(m, m)), speye(m, m));
+gamma_mat += kron(kron(speye(m, m), trap_rule), speye(m, m));
+gamma_mat += kron(kron(speye(m, m), speye(m, m)), trap_rule);
 
 disp("Setup finished")

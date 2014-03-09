@@ -15,21 +15,6 @@ function [time_vector, solution] = imex_ars233(F, G, start, step, end_time)
 end
 
 %!test
-%! step = 0.001;
-%! atol = 9 * step;
-%! time_vector = 0:(step):1;
-%!
-%! F = @(t, x) -1;
-%! G = [-1];
-%! handle = @(t, x) G * x + F(t, x);
-%!
-%! [t, y] = ode45(handle, time_vector, [0.5]);
-%!
-%! [tt, yy] = imex_ars233(F, G, [0.5], step, 1);
-%!
-%! assert(yy, y', atol);
-
-%!test
 %! step = 0.01;
 %! atol = step * 9;
 %! time_vector = 0:(step):1;

@@ -5,7 +5,7 @@ function [time_vector, solution] = imex_mcnab(F, G, start, step, end_time)
   c = [1/16 3/8 9/16];
 
   % FIXME handle better the case of 
-  if (start + step > end_time)
+  if (step > end_time)
     disp("Warning: Couldn't reach multistep phase. Not enough steps")
     [time_vector, solution] = imex_euler111(F, G, start, end_time, end_time);
     return;
@@ -27,6 +27,6 @@ end
 %!
 %! [t, y] = ode45(handle, time_vector, [0.5 0.5]);
 %!
-%! [tt, yy] = imex_cnab(F, G, [0.5; 0.5], step, 1);
+%! [tt, yy] = imex_mcnab(F, G, [0.5; 0.5], step, 1);
 %!
 %! assert(yy, y', step); 

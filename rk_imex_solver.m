@@ -36,7 +36,10 @@ function [time_vector, solution] = rk_imex_solver(F, G, start, step, end_time, t
         % Solve X = G * (tmp + step * a_ii * X) => (I - step * a_ii * G) X = G * tmp
         lhs = @(x) x - step * A(ii, ii) * G * x;
         %FIXME Do not hardcode tolerances
-        implicit_stages(:, ii) = bicgstab(lhs, G * tmp, 10^-4, 60, [], [], solution(:, jj-1));
+        %[L, U] = luinc(G, 10^-1);
+        L = [];
+        U = [];
+        implicit_stages(:, ii) = bicgstab(lhs, G * tmp, 10^-4, 60, L, U, solution(:, jj-1));
       else
         lhs = speye(length(start)) - step * A(ii, ii) * G;
         implicit_stages(:, ii) = lhs \ (G * tmp);
