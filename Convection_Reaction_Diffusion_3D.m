@@ -5,7 +5,7 @@ source setup_3D.m
 
 %IMEX
 implicit_disc = b / (h^2) * laplacian + c * speye(num_el, num_el) + 0.25 * sigma * sigma * 0.5 * mixed_derivatives / (h^2);
-explicit_disc = a / h * 0.5 * grad + lambda * h^3 * gamma_mat;
+explicit_disc = a / h * 0.5 * grad + lambda * h^3 * int_mat;
 
 iv = initial_conditions_vector(not(pattern)');
 
@@ -15,7 +15,7 @@ f = implicit_disc(not(pattern), pattern) * initial_conditions_vector(pattern) + 
 F = @(t, x) explicit_disc(not(pattern), not(pattern)) * x + f * exp(-r * t);
 G = implicit_disc(not(pattern), not(pattern));
 
-clear implicit_disc explicit_disc f grad laplacian mixed_derivatives gamma_mat;
+clear implicit_disc explicit_disc f grad laplacian mixed_derivatives int_mat gamma_mat;
 
 %gamma = (3 + sqrt(3)) / 6;
 %k = sqrt(4 * gamma - 1) * h / (3 * gamma * a);

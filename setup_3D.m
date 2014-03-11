@@ -5,12 +5,12 @@
 r = 0.05; %r = 0.05;
 sigma = 0.3;
 
-lambda = 2;
-delta = 1;
+lambda = 1;
+delta = 0.2;
 E = exp(delta^2); % Moment generating function?
 
-K = 100;
-S_max = 400;
+K = 20;
+S_max = 60;
 S_min = 1;
 
 % PDE parameters, after a change of value
@@ -23,8 +23,8 @@ if (abs(a) > abs(b))
 end
 
 % Grid parameters
-m = 81; % Number of grid points
-h = (log(S_max) - log(S_min)) / (m - 1); % 
+m = 61; % Number of grid points
+h = (log(S_max) - log(S_min)) / (m - 1);
 
 % x = log(S)
 grid_vector = linspace(log(S_min), log(S_max), m);
@@ -93,11 +93,10 @@ gamma_mat(:, [1 end]) = gamma_mat(:, [1 end]) * 0.5; % Matlab dislikes *=
 % This means that the integral term in x is equal to the convolution of the
 % solution with a gaussian random variable centered in x
 gamma_mat = gamma_mat .* normpdf(grid_x(:, :, 1), grid_x(:, :, 1)', delta);
-
 gamma_mat = sparse(gamma_mat);
 
-gamma_mat = kron(kron(trap_rule, speye(m, m)), speye(m, m));
-gamma_mat += kron(kron(speye(m, m), trap_rule), speye(m, m));
-gamma_mat += kron(kron(speye(m, m), speye(m, m)), trap_rule);
+int_mat = kron(kron(gamma_mat, speye(m, m)), speye(m, m));
+int_mat = int_mat + kron(kron(speye(m, m), gamma_mat), speye(m, m));
+int_mat = int_mat + kron(kron(speye(m, m), speye(m, m)), gamma_mat);
 
 disp("Setup finished")
